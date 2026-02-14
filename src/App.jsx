@@ -13,13 +13,13 @@ function App() {
     const img = new Image();
     img.src = '/images/me.jpeg'; 
 
-    // STATE: 0 = Super Pixelated, 1 = Less Pixelated (but still pixelated)
+    // 0 = super pixelated, 1 = less pixelated
+
     const state = { val: 0 };
 
     const render = () => {
       if (!img.complete) return;
 
-      // 1. Sync Canvas Size
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
 
@@ -64,6 +64,11 @@ function App() {
       };
 
     img.onload = () => {
+      const aspectRatio = img.naturalWidth / img.naturalHeight;
+
+      canvas.style.width = '35vw';
+      canvas.style.height = `${35 / aspectRatio}vw`;
+      
       render();
       canvas.addEventListener('mouseover', onEnter);
       canvas.addEventListener('mouseout', onLeave);
@@ -77,7 +82,7 @@ function App() {
 
   return (
     <div className="container h-screen w-full flex items-center justify-center bg-black">
-      <canvas ref={canvasRef} className="pixel-canvas h-[60%] w-[35%]"></canvas>
+      <canvas ref={canvasRef} className="pixel-canvas"></canvas>
     </div>
   );
 }
