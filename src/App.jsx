@@ -1,78 +1,85 @@
-import { useRef, useState } from 'react';
-import { useEffect } from 'react'
-import './App.css'
+import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
+import './App.css';
 
 function App() {
-
-  const ref = useRef(null);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (!ref.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    const canvas = ref.current;
-    const cx = canvas.getContext('2d');
-
-    const state = {
-      pixel_Ratio: 0.065,
-    }
-
+    const ctx = canvas.getContext('2d');
     const img = new Image();
-    img.src = '/images/me.jpeg';
-   const render = () => {
-    const { width, height } = canvas;
-    const scaled_w = width * state.pixel_Ratio;
-    const scaled_h = height * state.pixel_Ratio;
+    img.src = '/images/me.jpeg'; 
 
-    cx.clearRect(0, 0, width, height);
-    cx.imageSmoothingEnabled = false;
+    // STATE: 0 = Super Pixelated, 1 = Less Pixelated (but still pixelated)
+    const state = { val: 0 };
 
-    cx.drawImage(img, 0, 0, scaled_w, scaled_h);
+    const render = () => {
+      if (!img.complete) return;
 
-    const jitter = state.pixel_Ratio < 0.9 ? Math.random() * 10 : 0;
-    
-    cx.drawImage(canvas, 0, 0, scaled_w, scaled_h, -jitter, 0, width, height);
+      // 1. Sync Canvas Size
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
 
-    cx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.085})`; 
-    cx.fillRect(0, 0, width, height);
-    
-    cx.globalCompositeOperation = "source-over"; 
-}
+      const w = canvas.width;
+      const h = canvas.height;
+
+      const maxCols = 20; 
+      const cols = Math.floor(10 + (maxCols - 10) * state.val);
+
+      const s_size = w / cols;
+      const rows = Math.ceil(h / s_size);
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.imageSmoothingEnabled = false;
+
+      ctx.drawImage(img, 0, 0, cols, rows);
+
+      ctx.drawImage(canvas, 0, 0, cols, rows, 0, 0, w, h);
+    };
+
+    const onEnter = () => {
+      gsap.to(state, {
+        val: 1, 
+        ease: "steps(1.5)",
+        duration: 0.8,
+        onUpdate: render,
+        onComplete: () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        }
+      });
+    };
+
+    const onLeave = () => {
+        gsap.to(state, {
+          val: 0.0,
+          duration: 0.8,
+          ease: "steps(3)",
+          onUpdate: render,
+        });
+      };
+
     img.onload = () => {
+      render();
+      canvas.addEventListener('mouseover', onEnter);
+      canvas.addEventListener('mouseout', onLeave);
+    };
 
-      canvas.addEventListener('mouseover', (e) => {
-      gsap.to(state, {
-        pixel_Ratio: 1,
-        duration: 0.6,
-        ease: "expo.in",
-        onUpdate: render,
-        force3D: true,
-      });
-    });
-
-    canvas.addEventListener('mouseleave', (e) => {
-      gsap.to(state, {
-        pixel_Ratio: 0.065,
-        duration: 0.6,
-        ease: "expo.out",
-        onUpdate: render,
-        force3D: true,
-      });
-    });
-
-          render();
-
-    }
-
+    return () => {
+      canvas.removeEventListener('mouseover', onEnter);
+      canvas.removeEventListener('mouseout', onLeave);
+    };
   }, []);
 
   return (
-    <>
-    <div className="container h-screen w-full flex items-center justify-center relative">
-      <canvas ref={ref} className="pixel-canvas h-[60%] w-[35%] bg-blue-500"></canvas>
+    <div className="container h-screen w-full flex items-center justify-center bg-black">
+      <canvas ref={canvasRef} className="pixel-canvas h-[60%] w-[35%]"></canvas>
     </div>
-    </>
-  )
+  );
 }
 
-export default App
+export default App;
