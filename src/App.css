@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+.pixel-canvas {
+ 
+  filter: contrast(5) brightness(0.5) blur(2px); 
+  background: black; 
+  transition: filter 0.3s ease;
+}
+
+.pixel-canvas:hover {
+  filter: contrast(1) brightness(1); 
+}
