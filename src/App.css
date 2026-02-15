@@ -4,15 +4,28 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: black;
+  background: white;
 }
 
 .pixel-canvas {
-  background: black;
+  background: white;
   filter: blur(1.5px) contrast(110%) brightness(1.05);
   transition: filter 0.5s ease;
 }
 
 .pixel-canvas:hover {
   filter: blur(1.5px) contrast(100%) brightness(1);
+}
+
+@font-face {
+  font-family: "Geist";
+  src: url('/fonts/Geist.ttf') format('truetype');
+}
+
+.font-geist {
+  font-family: "Geist", sans-serif;
+}
+
+.intro-text {
+  letter-spacing: -4%;
 }
