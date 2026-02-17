@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html, body {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -18,8 +22,4 @@ body {
 
 .font-geist {
   font-family: "Geist", sans-serif;
-}
-
-.intro-text {
-  letter-spacing: -4%;
 }
